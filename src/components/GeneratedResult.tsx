@@ -1,34 +1,63 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import type { GeneratedContent } from '@/types';
 import CopyButton from './CopyButton';
 
-interface ResultSectionProps {
+interface FieldRowProps {
   label: string;
   children: React.ReactNode;
   copyText: string;
 }
 
-function ResultSection({ label, children, copyText }: ResultSectionProps) {
+function FieldRow({ label, children, copyText }: FieldRowProps) {
   return (
     <div className="border border-slate-100 rounded-lg overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-2.5 bg-slate-50 border-b border-slate-100">
-        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-          {label}
-        </span>
+      <div className="flex items-center justify-between px-3 py-2 bg-slate-50 border-b border-slate-100">
+        <span className="text-xs font-semibold text-slate-500">{label}</span>
         <CopyButton text={copyText} />
       </div>
-      <div className="px-4 py-3">{children}</div>
+      <div className="px-3 py-2.5">{children}</div>
     </div>
   );
 }
+
+const INPUT_CLASS =
+  'w-full text-sm text-slate-700 border-0 focus:outline-none focus:ring-0 bg-transparent p-0 placeholder:text-slate-300';
+const TEXTAREA_CLASS =
+  'w-full text-sm text-slate-700 border-0 focus:outline-none focus:ring-0 bg-transparent p-0 placeholder:text-slate-300 resize-none';
 
 interface Props {
   content: GeneratedContent | null;
 }
 
 export default function GeneratedResult({ content }: Props) {
-  if (!content) {
+  const [edited, setEdited] = useState<GeneratedContent | null>(null);
+
+  useEffect(() => {
+    setEdited(content);
+  }, [content]);
+
+  const set = (key: keyof GeneratedContent, value: string) => {
+    if (!edited) return;
+    setEdited({ ...edited, [key]: value });
+  };
+
+  const allText = edited
+    ? [
+        `【タイトル】\n${edited.title}`,
+        `【サブタイトル】\n${edited.subtitle}`,
+        `【説明文】\n${edited.description}`,
+        `【検索キーワード】\n${edited.keywords}`,
+        `【カテゴリー候補】\n${edited.categories}`,
+        `【業種】\n${edited.industry}`,
+        `【担当範囲】\n${edited.scope}`,
+        `【制作ポイント】\n${edited.productionPoint}`,
+        `【上司・社内確認用メモ】\n${edited.shareNote}`,
+      ].join('\n\n')
+    : '';
+
+  if (!content || !edited) {
     return (
       <div className="bg-white border border-slate-200 rounded-xl shadow-sm flex flex-col items-center justify-center min-h-80 py-16 px-8 text-center">
         <div className="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center mb-4">
@@ -46,7 +75,7 @@ export default function GeneratedResult({ content }: Props) {
             />
           </svg>
         </div>
-        <p className="text-sm font-medium text-slate-400">左のフォームに情報を入力して</p>
+        <p className="text-sm font-medium text-slate-400">左のフォームで制作物を選択して</p>
         <p className="text-sm text-slate-400 mt-0.5">「生成する」ボタンを押してください</p>
       </div>
     );
@@ -55,65 +84,106 @@ export default function GeneratedResult({ content }: Props) {
   return (
     <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
       {/* Panel header */}
-      <div className="px-6 py-4 border-b border-slate-100 bg-slate-50">
-        <h2 className="text-sm font-semibold text-slate-800">生成結果</h2>
-        <p className="text-xs text-slate-500 mt-0.5">
-          各項目をコピーしてポートフォリオに貼り付けてください
-        </p>
+      <div className="px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between gap-4">
+        <div>
+          <h2 className="text-sm font-semibold text-slate-800">ランサーズ貼り付け用テキスト</h2>
+          <p className="text-xs text-slate-500 mt-0.5">
+            各項目を直接編集できます。コピーして貼り付けてください。
+          </p>
+        </div>
+        <CopyButton text={allText} size="md" />
       </div>
 
       <div className="px-6 py-5 space-y-3">
-        {/* Title */}
-        <ResultSection label="ポートフォリオタイトル" copyText={content.title}>
-          <p className="text-sm font-semibold text-slate-800 leading-relaxed">{content.title}</p>
-        </ResultSection>
+        {/* タイトル */}
+        <FieldRow label="タイトル" copyText={edited.title}>
+          <input
+            type="text"
+            value={edited.title}
+            onChange={(e) => set('title', e.target.value)}
+            className={INPUT_CLASS}
+          />
+        </FieldRow>
 
-        {/* Description */}
-        <ResultSection label="説明文" copyText={content.description}>
-          <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">
-            {content.description}
-          </p>
-        </ResultSection>
+        {/* サブタイトル */}
+        <FieldRow label="サブタイトル" copyText={edited.subtitle}>
+          <input
+            type="text"
+            value={edited.subtitle}
+            onChange={(e) => set('subtitle', e.target.value)}
+            className={INPUT_CLASS}
+          />
+        </FieldRow>
 
-        {/* Scope */}
-        <ResultSection label="担当範囲" copyText={content.scope}>
-          <p className="text-sm text-slate-700 leading-relaxed">{content.scope}</p>
-        </ResultSection>
+        {/* 説明文 */}
+        <FieldRow label="説明文" copyText={edited.description}>
+          <textarea
+            value={edited.description}
+            onChange={(e) => set('description', e.target.value)}
+            rows={4}
+            className={TEXTAREA_CLASS}
+          />
+        </FieldRow>
 
-        {/* Categories */}
-        <ResultSection label="カテゴリ候補" copyText={content.categories.join(' / ')}>
-          <div className="flex flex-wrap gap-1.5">
-            {content.categories.map((cat) => (
-              <span
-                key={cat}
-                className="px-2.5 py-1 bg-slate-100 text-slate-600 text-xs rounded-md font-medium"
-              >
-                {cat}
-              </span>
-            ))}
-          </div>
-        </ResultSection>
+        {/* 検索キーワード */}
+        <FieldRow label="検索キーワード" copyText={edited.keywords}>
+          <input
+            type="text"
+            value={edited.keywords}
+            onChange={(e) => set('keywords', e.target.value)}
+            className={INPUT_CLASS}
+          />
+        </FieldRow>
 
-        {/* Tags */}
-        <ResultSection label="タグ候補" copyText={content.tags.join(' ')}>
-          <div className="flex flex-wrap gap-1.5">
-            {content.tags.map((tag) => (
-              <span
-                key={tag}
-                className="px-2.5 py-1 bg-blue-50 text-blue-600 text-xs rounded-md font-medium"
-              >
-                #{tag}
-              </span>
-            ))}
-          </div>
-        </ResultSection>
+        {/* カテゴリー候補 */}
+        <FieldRow label="カテゴリー候補" copyText={edited.categories}>
+          <input
+            type="text"
+            value={edited.categories}
+            onChange={(e) => set('categories', e.target.value)}
+            className={INPUT_CLASS}
+          />
+        </FieldRow>
 
-        {/* Share note */}
-        <ResultSection label="上司確認用の共有文" copyText={content.shareNote}>
-          <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-wrap font-mono text-xs bg-slate-50 rounded p-2">
-            {content.shareNote}
-          </p>
-        </ResultSection>
+        {/* 業種 */}
+        <FieldRow label="業種" copyText={edited.industry}>
+          <input
+            type="text"
+            value={edited.industry}
+            onChange={(e) => set('industry', e.target.value)}
+            className={INPUT_CLASS}
+          />
+        </FieldRow>
+
+        {/* 担当範囲 */}
+        <FieldRow label="担当範囲" copyText={edited.scope}>
+          <input
+            type="text"
+            value={edited.scope}
+            onChange={(e) => set('scope', e.target.value)}
+            className={INPUT_CLASS}
+          />
+        </FieldRow>
+
+        {/* 制作ポイント */}
+        <FieldRow label="制作ポイント" copyText={edited.productionPoint}>
+          <textarea
+            value={edited.productionPoint}
+            onChange={(e) => set('productionPoint', e.target.value)}
+            rows={3}
+            className={TEXTAREA_CLASS}
+          />
+        </FieldRow>
+
+        {/* 上司・社内確認用メモ */}
+        <FieldRow label="上司・社内確認用メモ" copyText={edited.shareNote}>
+          <textarea
+            value={edited.shareNote}
+            onChange={(e) => set('shareNote', e.target.value)}
+            rows={3}
+            className={`${TEXTAREA_CLASS} font-mono text-xs`}
+          />
+        </FieldRow>
       </div>
     </div>
   );

@@ -13,12 +13,8 @@ const MAX_HISTORY = 20;
 const INITIAL_FORM: PortfolioFormData = {
   workType: 'チラシ',
   productionType: '依頼を受けて制作',
-  industry: '',
-  target: '',
-  designFeature: '',
-  purpose: '',
-  scope: '',
   memo: '',
+  imageName: '',
 };
 
 function loadHistory(): HistoryEntry[] {
@@ -121,7 +117,7 @@ export default function Home() {
             />
           </svg>
           <p className="text-xs text-blue-700 leading-relaxed">
-            制作物タイプ・制作区分を選び、業種やデザインの特徴を入力して「生成する」を押すと、ランサーズ・クラウドワークスに貼り付けられるポートフォリオ文章が自動で生成されます。
+            制作物タイプ・制作区分を選択し、制作した画像をアップロードして「生成する」を押すと、ランサーズ・クラウドワークスに貼り付けられるポートフォリオ文章が自動で生成されます。
           </p>
         </div>
 

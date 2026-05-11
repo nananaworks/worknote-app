@@ -34,7 +34,12 @@ export default function HistoryPanel({ history, onSelect, onDelete, onClose }: P
           aria-label="閉じる"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>
@@ -50,13 +55,12 @@ export default function HistoryPanel({ history, onSelect, onDelete, onClose }: P
               key={entry.id}
               className="px-6 py-4 flex items-start gap-4 hover:bg-slate-50 transition-colors"
             >
-              {/* Select button (main row area) */}
               <button
                 type="button"
                 onClick={() => onSelect(entry)}
                 className="flex-1 text-left min-w-0"
               >
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-2 mb-1 flex-wrap">
                   <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-md font-medium flex-shrink-0">
                     {entry.formData.workType}
                   </span>
@@ -70,12 +74,16 @@ export default function HistoryPanel({ history, onSelect, onDelete, onClose }: P
                 <p className="text-sm font-medium text-slate-700 truncate">
                   {entry.generatedContent.title}
                 </p>
-                <p className="text-xs text-slate-400 mt-0.5 truncate">
+                {entry.formData.imageName && (
+                  <p className="text-xs text-slate-400 mt-0.5 truncate">
+                    📎 {entry.formData.imageName}
+                  </p>
+                )}
+                <p className="text-xs text-slate-400 mt-0.5 truncate leading-relaxed">
                   {entry.generatedContent.description}
                 </p>
               </button>
 
-              {/* Delete button */}
               <button
                 type="button"
                 onClick={() => onDelete(entry.id)}

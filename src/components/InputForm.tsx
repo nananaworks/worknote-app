@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef, useState, useCallback } from 'react';
 import type { PortfolioFormData, WorkType, ProductionType } from '@/types';
 
 const WORK_TYPES: WorkType[] = [
@@ -21,49 +22,7 @@ const PRODUCTION_TYPES: { value: ProductionType; label: string; desc: string }[]
   { value: '架空案件', label: '架空案件', desc: '架空クライアントを想定' },
 ];
 
-type StringFieldKey = 'industry' | 'target' | 'designFeature' | 'purpose' | 'scope' | 'memo';
-
-const TEXT_FIELDS: {
-  key: StringFieldKey;
-  label: string;
-  placeholder: string;
-  hint?: string;
-  multiline?: boolean;
-}[] = [
-  {
-    key: 'industry',
-    label: '業種',
-    placeholder: '例：飲食店、美容院、IT企業、アパレル',
-    hint: '制作したポートフォリオの業種を入力してください',
-  },
-  {
-    key: 'target',
-    label: 'ターゲット',
-    placeholder: '例：20〜30代の女性、中小企業の経営者',
-  },
-  {
-    key: 'designFeature',
-    label: 'デザインの特徴',
-    placeholder: '例：シンプルで清潔感のある、温かみがあって親しみやすい',
-  },
-  {
-    key: 'purpose',
-    label: '使用目的',
-    placeholder: '例：集客・販促、ブランドイメージ向上、新商品のPR',
-  },
-  {
-    key: 'scope',
-    label: '担当範囲',
-    placeholder: '例：デザイン・レイアウト・入稿データ作成（空欄で自動生成）',
-    hint: '空欄の場合、制作物タイプに合わせて自動で生成されます',
-  },
-  {
-    key: 'memo',
-    label: '補足メモ',
-    placeholder: '例：Photoshop / Illustratorで制作。印刷入稿まで対応。',
-    multiline: true,
-  },
-];
+const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 interface Props {
   formData: PortfolioFormData;
@@ -72,23 +31,67 @@ interface Props {
 }
 
 export default function InputForm({ formData, onChange, onGenerate }: Props) {
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const setWorkType = (value: WorkType) => onChange({ ...formData, workType: value });
   const setProductionType = (value: ProductionType) =>
     onChange({ ...formData, productionType: value });
-  const handleTextChange = (key: StringFieldKey, value: string) =>
-    onChange({ ...formData, [key]: value } as PortfolioFormData);
+
+  const handleFile = useCallback(
+    (file: File) => {
+      if (!ACCEPTED_TYPES.includes(file.type)) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreviewUrl(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+      onChange({ ...formData, imageName: file.name });
+    },
+    [formData, onChange],
+  );
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => setIsDragging(false);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleFile(file);
+  };
+
+  const handleRemoveImage = () => {
+    setImagePreviewUrl(null);
+    onChange({ ...formData, imageName: '' });
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleReplaceImage = () => {
+    fileInputRef.current?.click();
+  };
 
   return (
     <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col">
       {/* Panel header */}
       <div className="px-6 py-4 border-b border-slate-100 bg-slate-50">
-        <h2 className="text-sm font-semibold text-slate-800">制作情報を入力</h2>
+        <h2 className="text-sm font-semibold text-slate-800">制作情報</h2>
         <p className="text-xs text-slate-500 mt-0.5">
-          各項目を入力してポートフォリオ文章を生成します
+          タイプを選択して画像をアップロードしてください
         </p>
       </div>
 
-      <div className="px-6 py-5 space-y-6 flex-1 overflow-auto">
+      <div className="px-6 py-5 space-y-6 flex-1">
         {/* Work Type */}
         <fieldset>
           <legend className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">
@@ -136,34 +139,111 @@ export default function InputForm({ formData, onChange, onGenerate }: Props) {
           </div>
         </fieldset>
 
-        {/* Divider */}
         <div className="border-t border-slate-100" />
 
-        {/* Text fields */}
-        <div className="space-y-4">
-          {TEXT_FIELDS.map(({ key, label, placeholder, hint, multiline }) => (
-            <div key={key}>
-              <label className="block text-xs font-semibold text-slate-600 mb-1.5">{label}</label>
-              {multiline ? (
-                <textarea
-                  value={formData[key]}
-                  onChange={(e) => handleTextChange(key, e.target.value)}
-                  placeholder={placeholder}
-                  rows={2}
-                  className="w-full px-3 py-2 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 placeholder:text-slate-300 resize-none"
+        {/* Image upload */}
+        <div>
+          <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">
+            制作物画像
+          </p>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".jpg,.jpeg,.png,.webp"
+            className="hidden"
+            onChange={handleInputChange}
+          />
+
+          {imagePreviewUrl ? (
+            <div className="border border-slate-200 rounded-xl overflow-hidden">
+              <div className="relative bg-slate-50">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={imagePreviewUrl}
+                  alt="アップロード画像のプレビュー"
+                  className="w-full object-contain max-h-56"
                 />
-              ) : (
-                <input
-                  type="text"
-                  value={formData[key]}
-                  onChange={(e) => handleTextChange(key, e.target.value)}
-                  placeholder={placeholder}
-                  className="w-full px-3 py-2 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 placeholder:text-slate-300"
-                />
-              )}
-              {hint && <p className="text-xs text-slate-400 mt-1">{hint}</p>}
+              </div>
+              <div className="flex items-center justify-between px-3 py-2.5 bg-white border-t border-slate-100">
+                <span className="text-xs text-slate-500 truncate max-w-[60%]">
+                  {formData.imageName}
+                </span>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <button
+                    type="button"
+                    onClick={handleReplaceImage}
+                    className="text-xs text-blue-600 hover:text-blue-700 border border-blue-200 hover:border-blue-300 px-2.5 py-1 rounded-md transition-colors"
+                  >
+                    差し替え
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="text-xs text-slate-400 hover:text-red-500 border border-slate-200 hover:border-red-200 px-2.5 py-1 rounded-md transition-colors"
+                  >
+                    削除
+                  </button>
+                </div>
+              </div>
             </div>
-          ))}
+          ) : (
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => fileInputRef.current?.click()}
+              onKeyDown={(e) => e.key === 'Enter' && fileInputRef.current?.click()}
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              className={`border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-3 py-10 px-6 text-center cursor-pointer transition-colors ${
+                isDragging
+                  ? 'border-blue-400 bg-blue-50'
+                  : 'border-slate-200 bg-slate-50 hover:border-blue-300 hover:bg-blue-50/40'
+              }`}
+            >
+              <div className="w-12 h-12 bg-white border border-slate-200 rounded-xl flex items-center justify-center shadow-sm">
+                <svg
+                  className="w-6 h-6 text-slate-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm text-slate-600 font-medium leading-relaxed">
+                  ここに制作した画像をドラッグ&ドロップ、
+                  <br className="hidden sm:block" />
+                  またはクリックして選択してください
+                </p>
+                <p className="text-xs text-slate-400 mt-1">JPG / PNG / WebP 対応</p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Memo */}
+        <div>
+          <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">
+            補足メモ{' '}
+            <span className="text-slate-400 font-normal normal-case tracking-normal ml-1">
+              任意
+            </span>
+          </label>
+          <textarea
+            value={formData.memo}
+            onChange={(e) => onChange({ ...formData, memo: e.target.value })}
+            placeholder="例：美容室のキャンペーンチラシ。春らしい明るい印象で制作。Photoshop / Illustratorで作成。"
+            rows={3}
+            className="w-full px-3 py-2 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 placeholder:text-slate-300 resize-none"
+          />
         </div>
       </div>
 

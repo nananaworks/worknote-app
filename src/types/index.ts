@@ -15,20 +15,19 @@ export type ProductionType = '依頼を受けて制作' | 'サンプル制作' |
 export interface PortfolioFormData {
   workType: WorkType;
   productionType: ProductionType;
-  industry: string;
-  target: string;
-  designFeature: string;
-  purpose: string;
-  scope: string;
   memo: string;
+  imageName: string;
 }
 
 export interface GeneratedContent {
   title: string;
+  subtitle: string;
   description: string;
+  keywords: string;
+  categories: string;
+  industry: string;
   scope: string;
-  categories: string[];
-  tags: string[];
+  productionPoint: string;
   shareNote: string;
 }
 

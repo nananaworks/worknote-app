@@ -1,146 +1,277 @@
-import type { PortfolioFormData, GeneratedContent, WorkType } from '@/types';
+import type { PortfolioFormData, GeneratedContent, WorkType, ProductionType } from '@/types';
 
-const DEFAULT_SCOPES: Record<WorkType, string> = {
-  チラシ: 'デザイン企画・レイアウト構成・タイポグラフィ・入稿データ作成',
-  メニュー表: 'デザイン企画・レイアウト構成・写真選定・入稿データ作成',
-  LP: 'ページ構成設計・UIデザイン・レスポンシブ対応・HTML/CSSコーディング',
-  Webサイト: 'サイト設計・UIデザイン・ページ制作・レスポンシブ対応',
-  Amazon商品画像: '商品画像レタッチ・テキストレイアウト・サムネイル・バナー画像作成',
-  YouTubeサムネイル: 'サムネイルデザイン・テキストレイアウト・画像加工',
-  ロゴ: 'コンセプト設計・ロゴデザイン・カラーバリエーション・ガイドライン策定',
-  バナー: 'バナーデザイン・テキストレイアウト・サイズバリエーション対応',
-  カタログ: 'デザイン企画・ページレイアウト・写真加工・印刷入稿データ作成',
-  名刺: '名刺デザイン・レイアウト構成・入稿データ作成',
+interface WorkTypeTemplate {
+  title: Record<ProductionType, string>;
+  subtitle: string;
+  description: Record<ProductionType, string>;
+  keywords: string;
+  categories: string;
+  industry: string;
+  scope: string;
+  productionPoint: string;
+}
+
+const TEMPLATES: Record<WorkType, WorkTypeTemplate> = {
+  チラシ: {
+    title: {
+      '依頼を受けて制作': '店舗集客向けキャンペーンチラシデザイン',
+      'サンプル制作': '販促用チラシデザイン',
+      '架空案件': 'キャンペーン告知チラシデザイン',
+    },
+    subtitle: '視認性と訴求力を意識した、販促用チラシデザインです。',
+    description: {
+      '依頼を受けて制作':
+        'クライアントからの依頼を受け、店舗集客やキャンペーン告知を目的としたチラシを制作しました。情報の優先順位を整理し、見出し・写真・訴求文が伝わりやすくなるようにレイアウトを設計しています。読み手が内容を把握しやすいよう、余白や文字サイズ、配色のバランスにも配慮しました。',
+      'サンプル制作':
+        '販促物制作のスキルを示すサンプルとして、チラシデザインを制作しました。情報の優先順位を整理し、見出し・写真・訴求文が伝わりやすくなるようにレイアウトを設計しています。余白や文字サイズ、配色のバランスに配慮し、読みやすい仕上がりを意識しました。',
+      '架空案件':
+        '架空のクライアントを想定し、キャンペーン告知を目的としたチラシを制作しました。情報の優先順位を整理し、見出し・写真・訴求文が伝わりやすくなるようにレイアウトを設計しています。余白や文字サイズ、配色のバランスにも配慮しました。',
+    },
+    keywords: 'チラシデザイン, フライヤー, 販促物, 店舗集客, キャンペーン, 印刷物デザイン',
+    categories: 'チラシ作成・フライヤーデザイン / カタログ・パンフレットデザイン / その他デザイン',
+    industry: '店舗・サービス業',
+    scope: 'デザイン制作 / レイアウト設計 / 文字組み / 入稿データ作成',
+    productionPoint:
+      '視線の流れを意識し、重要な情報が自然に目に入る構成にしました。販促物としての分かりやすさと、ブランドイメージを損なわないデザインの両立を意識しています。',
+  },
+
+  メニュー表: {
+    title: {
+      '依頼を受けて制作': '飲食店向けメニュー表デザイン',
+      'サンプル制作': '飲食店向けメニュー表デザイン',
+      '架空案件': 'カフェ・飲食店向けメニュー表デザイン',
+    },
+    subtitle: '料理の魅力が伝わる、見やすく整理されたメニュー表デザインです。',
+    description: {
+      '依頼を受けて制作':
+        'クライアントからの依頼を受け、飲食店向けのメニュー表を制作しました。商品名や価格が見やすく、来店客がスムーズに選びやすい構成を意識しています。写真や余白、文字サイズのバランスを整え、店舗の雰囲気に合うデザインに仕上げました。',
+      'サンプル制作':
+        '飲食店での利用を想定し、サンプルとしてメニュー表デザインを制作しました。商品名や価格が見やすく、来店客がスムーズに選びやすい構成を意識しています。写真や余白、文字サイズのバランスを整え、店舗の雰囲気に合うデザインに仕上げました。',
+      '架空案件':
+        '架空の飲食店を想定し、メニュー表デザインを制作しました。商品名や価格が見やすく、来店客がスムーズに選びやすい構成を意識しています。写真や余白、文字サイズのバランスを整え、店舗の雰囲気に合うデザインに仕上げました。',
+    },
+    keywords: 'メニュー表デザイン, メニューブック, 飲食店, 印刷物デザイン, グラフィックデザイン',
+    categories: 'メニュー・POP制作 / グラフィックデザイン / 印刷物デザイン',
+    industry: '飲食業',
+    scope: 'デザイン制作 / レイアウト設計 / 文字組み / メニュー構成整理',
+    productionPoint:
+      'メニュー数が多い場合でも情報が読み取りやすいよう、カテゴリ分けや余白の取り方に配慮しました。飲食店らしい温かみと清潔感を両立したデザインを意識しています。',
+  },
+
+  LP: {
+    title: {
+      '依頼を受けて制作': 'サービス訴求向けランディングページデザイン',
+      'サンプル制作': 'サービス訴求向けランディングページデザイン',
+      '架空案件': 'サービス訴求向けランディングページデザイン',
+    },
+    subtitle: '問い合わせ・申し込みにつながる導線を意識したLPデザインです。',
+    description: {
+      '依頼を受けて制作':
+        'クライアントからの依頼を受け、サービス紹介を目的としたランディングページデザインを制作しました。ファーストビューでサービスの魅力が伝わるように構成し、各セクションで課題提起・サービス紹介・強み・導入メリット・CTAへ自然につながる流れを意識しています。',
+      'サンプル制作':
+        'スキルを示すサンプルとして、サービス紹介を目的としたランディングページデザインを制作しました。ファーストビューでサービスの魅力が伝わるように構成し、各セクションが自然につながる流れを意識しています。',
+      '架空案件':
+        '架空案件として、サービス紹介を目的としたランディングページデザインを制作しました。ファーストビューでサービスの魅力が伝わるように構成し、各セクションで課題提起・サービス紹介・強み・導入メリット・CTAへ自然につながる流れを意識しています。',
+    },
+    keywords: 'LPデザイン, ランディングページ, Webデザイン, UI, コンバージョン, バナーデザイン',
+    categories: 'ランディングページ制作 / Webデザイン / UI/UXデザイン',
+    industry: 'IT・Web・サービス業',
+    scope: 'LPデザイン / ワイヤーフレーム設計 / セクション構成 / UIデザイン',
+    productionPoint:
+      'ユーザーが情報を追いやすいよう、余白・見出し・ボタン配置を整理しました。問い合わせや申し込みにつながる導線設計を意識しています。',
+  },
+
+  Webサイト: {
+    title: {
+      '依頼を受けて制作': 'コーポレートサイトデザイン',
+      'サンプル制作': 'コーポレートサイトデザイン',
+      '架空案件': 'コーポレートサイトデザイン',
+    },
+    subtitle: '情報が整理された、使いやすいWebサイトデザインです。',
+    description: {
+      '依頼を受けて制作':
+        'クライアントからの依頼を受け、コーポレートサイトのデザインを制作しました。ユーザーが目的のページへスムーズにたどり着けるよう、サイト構造とナビゲーションを整理しています。レスポンシブ対応を前提にデザインし、PC・スマートフォン両方で使いやすい仕上がりを意識しました。',
+      'サンプル制作':
+        'スキルを示すサンプルとして、コーポレートサイトのデザインを制作しました。ユーザーが目的のページへスムーズにたどり着けるよう、サイト構造とナビゲーションを整理しています。レスポンシブ対応を前提にデザインしました。',
+      '架空案件':
+        '架空案件として、コーポレートサイトのデザインを制作しました。ユーザーが目的のページへスムーズにたどり着けるよう、サイト構造とナビゲーションを整理しています。レスポンシブ対応を前提にデザインし、PC・スマートフォン両方で使いやすい仕上がりを意識しました。',
+    },
+    keywords: 'Webデザイン, ホームページ, コーポレートサイト, レスポンシブ, HTML/CSS',
+    categories: 'Webサイト制作 / Webデザイン / コーディング',
+    industry: 'IT・Web・サービス業',
+    scope: 'サイト設計 / UIデザイン / ページ制作 / レスポンシブ対応',
+    productionPoint:
+      'ユーザーが迷わずに情報にたどり着けるよう、ページ構成とナビゲーションを設計しました。企業の信頼感を伝えるビジュアルと、読みやすいレイアウトを両立しています。',
+  },
+
+  Amazon商品画像: {
+    title: {
+      '依頼を受けて制作': 'Amazon商品画像デザイン',
+      'サンプル制作': 'Amazon商品画像デザイン',
+      '架空案件': 'Amazon商品画像デザイン',
+    },
+    subtitle: '商品の魅力が伝わる、クリック率を意識したAmazon用商品画像です。',
+    description: {
+      '依頼を受けて制作':
+        'クライアントからの依頼を受け、Amazon向けの商品画像を制作しました。検索結果一覧でも目に留まるメイン画像を中心に、商品の特徴や使用シーンが伝わるサブ画像も含めて制作しています。商品の強みが短時間で伝わるよう、テキストと画像のバランスを整えました。',
+      'サンプル制作':
+        'ECサイト向け商品画像制作のスキルを示すサンプルとして、Amazon向け商品画像を制作しました。検索結果一覧でも目に留まるメイン画像を中心に、商品の特徴が伝わるよう構成しています。',
+      '架空案件':
+        '架空の商品を想定し、Amazon向けの商品画像を制作しました。検索結果一覧でも目に留まるメイン画像を中心に、商品の特徴や使用シーンが伝わるサブ画像も含めて制作しています。',
+    },
+    keywords: 'Amazon商品画像, 商品画像, EC, サムネイル, Photoshop, ECデザイン',
+    categories: 'Amazon・EC商品画像制作 / バナー制作 / グラフィックデザイン',
+    industry: 'EC・通販業',
+    scope: '商品画像デザイン / テキストレイアウト / バナー・サブ画像作成',
+    productionPoint:
+      '検索結果一覧で目立つよう、商品の魅力が瞬時に伝わるビジュアルを意識しました。Amazonのガイドラインに沿いながら、クリックされやすい構成を設計しています。',
+  },
+
+  YouTubeサムネイル: {
+    title: {
+      '依頼を受けて制作': 'YouTubeサムネイルデザイン',
+      'サンプル制作': 'YouTubeサムネイルデザイン',
+      '架空案件': 'YouTubeサムネイルデザイン',
+    },
+    subtitle: 'クリック率を意識した、目を引くYouTubeサムネイルデザインです。',
+    description: {
+      '依頼を受けて制作':
+        'クライアントからの依頼を受け、YouTubeチャンネル向けのサムネイルを制作しました。一覧表示でも目に留まるよう、テキストの視認性と画像のインパクトを重視しています。チャンネルのトーンに合わせたデザインを意識しました。',
+      'サンプル制作':
+        'サムネイルデザインのスキルを示すサンプルとして、YouTube向けサムネイルを制作しました。一覧表示でも目に留まるよう、テキストの視認性と画像のインパクトを重視しています。',
+      '架空案件':
+        '架空のYouTubeチャンネルを想定し、サムネイルデザインを制作しました。一覧表示でも目に留まるよう、テキストの視認性と画像のインパクトを重視しています。チャンネルのトーンに合わせたデザインを意識しました。',
+    },
+    keywords: 'YouTubeサムネイル, サムネイルデザイン, Photoshop, バナーデザイン, 動画コンテンツ',
+    categories: 'サムネイル制作 / バナー制作 / グラフィックデザイン',
+    industry: 'メディア・動画コンテンツ',
+    scope: 'サムネイルデザイン / テキストレイアウト / 画像加工',
+    productionPoint:
+      'サムネイル一覧の中でも埋もれないよう、色彩とテキストの対比を意識しました。動画のテーマが瞬時に伝わる構成を心がけています。',
+  },
+
+  ロゴ: {
+    title: {
+      '依頼を受けて制作': 'ブランドロゴデザイン',
+      'サンプル制作': 'ブランドロゴデザイン',
+      '架空案件': 'ブランドロゴデザイン',
+    },
+    subtitle: 'ブランドの世界観を表現した、印象的なロゴデザインです。',
+    description: {
+      '依頼を受けて制作':
+        'クライアントからの依頼を受け、ブランドのロゴデザインを制作しました。ビジネスの方向性やターゲット層を踏まえたうえで、長く使えるシンプルかつ印象的なロゴを設計しています。カラーバリエーションやモノクロ対応など、実用的な納品形式も意識しました。',
+      'サンプル制作':
+        'ロゴデザインのスキルを示すサンプルとして、ブランドロゴを制作しました。長く使えるシンプルかつ印象的なロゴを設計し、カラーバリエーションやモノクロ対応も含めて仕上げています。',
+      '架空案件':
+        '架空のブランドを想定し、ロゴデザインを制作しました。ビジネスの方向性やターゲット層を踏まえたうえで、長く使えるシンプルかつ印象的なロゴを設計しています。',
+    },
+    keywords: 'ロゴデザイン, ブランディング, Illustrator, シンボルマーク, ロゴタイプ, CI',
+    categories: 'ロゴ・アイコン作成 / ブランドデザイン / グラフィックデザイン',
+    industry: '各業種',
+    scope: 'コンセプト設計 / ロゴデザイン / カラーバリエーション / データ納品',
+    productionPoint:
+      'ブランドの世界観と使いやすさを両立したロゴを意識しました。名刺・Web・印刷物など複数の用途で使えるよう、汎用性の高い設計にしています。',
+  },
+
+  バナー: {
+    title: {
+      '依頼を受けて制作': 'Webバナーデザイン',
+      'サンプル制作': 'Webバナーデザイン',
+      '架空案件': 'Webバナーデザイン',
+    },
+    subtitle: 'クリックを促す、訴求力のあるWebバナーデザインです。',
+    description: {
+      '依頼を受けて制作':
+        'クライアントからの依頼を受け、Web広告向けのバナーデザインを制作しました。訴求内容が瞬時に伝わるよう、テキストと画像のバランスを整え、ユーザーのクリックを促す構成を意識しています。複数のサイズバリエーションにも対応しました。',
+      'サンプル制作':
+        'バナーデザインのスキルを示すサンプルとして、Web広告向けバナーを制作しました。訴求内容が瞬時に伝わるよう、テキストと画像のバランスを整え、ユーザーのクリックを促す構成を意識しています。',
+      '架空案件':
+        '架空の広告案件を想定し、Web向けバナーデザインを制作しました。訴求内容が瞬時に伝わるよう、テキストと画像のバランスを整え、ユーザーのクリックを促す構成を意識しています。',
+    },
+    keywords: 'バナーデザイン, Webバナー, 広告バナー, Photoshop, Illustrator, 広告デザイン',
+    categories: 'バナー制作 / Webデザイン / グラフィックデザイン',
+    industry: 'IT・Web・サービス業',
+    scope: 'バナーデザイン / テキストレイアウト / サイズバリエーション対応',
+    productionPoint:
+      '限られたスペースの中で訴求ポイントが伝わるよう、情報の優先順位と視線誘導を意識しました。複数サイズへの展開も考慮したデザイン設計にしています。',
+  },
+
+  カタログ: {
+    title: {
+      '依頼を受けて制作': 'カタログ・パンフレットデザイン',
+      'サンプル制作': 'カタログ・パンフレットデザイン',
+      '架空案件': 'カタログ・パンフレットデザイン',
+    },
+    subtitle: '商品・サービスの魅力を伝える、読みやすいカタログデザインです。',
+    description: {
+      '依頼を受けて制作':
+        'クライアントからの依頼を受け、商品・サービス紹介用のカタログを制作しました。読み手が必要な情報にスムーズにアクセスできるよう、ページ構成とレイアウトを整理しています。写真や図版を効果的に配置し、視覚的に魅力が伝わる紙面を意識しました。',
+      'サンプル制作':
+        'カタログ制作のスキルを示すサンプルとして、商品・サービス紹介用のカタログを制作しました。読み手が必要な情報にスムーズにアクセスできるよう、ページ構成とレイアウトを整理しています。',
+      '架空案件':
+        '架空のクライアントを想定し、商品・サービス紹介用のカタログを制作しました。読み手が必要な情報にスムーズにアクセスできるよう、ページ構成とレイアウトを整理しています。',
+    },
+    keywords: 'カタログデザイン, パンフレット, DTP, Illustrator, 印刷物, グラフィックデザイン',
+    categories: 'カタログ・パンフレット制作 / グラフィックデザイン / 印刷物デザイン',
+    industry: '製造業・小売業',
+    scope: 'デザイン企画 / ページレイアウト / 写真加工 / 印刷入稿データ作成',
+    productionPoint:
+      'ページ数が多い場合でも流し読みしやすいよう、各ページの役割と情報量のバランスを整えました。写真と文字の配置を工夫し、視覚的に魅力的な紙面に仕上げています。',
+  },
+
+  名刺: {
+    title: {
+      '依頼を受けて制作': 'ビジネス用名刺デザイン',
+      'サンプル制作': 'ビジネス用名刺デザイン',
+      '架空案件': 'ビジネス用名刺デザイン',
+    },
+    subtitle: 'シンプルで印象的な、ビジネス用名刺デザインです。',
+    description: {
+      '依頼を受けて制作':
+        'クライアントからの依頼を受け、ビジネス用名刺のデザインを制作しました。必要な情報が見やすく整理されるよう、情報の優先順位とレイアウトを設計しています。渡した相手に好印象を与えるデザインと、実用的な読みやすさを両立しました。',
+      'サンプル制作':
+        '名刺デザインのスキルを示すサンプルとして、ビジネス用名刺を制作しました。必要な情報が見やすく整理されるよう、情報の優先順位とレイアウトを設計しています。',
+      '架空案件':
+        '架空のクライアントを想定し、ビジネス用名刺のデザインを制作しました。必要な情報が見やすく整理されるよう、情報の優先順位とレイアウトを設計しています。',
+    },
+    keywords: '名刺デザイン, ショップカード, DTP, Illustrator, ビジネス, 印刷物',
+    categories: '名刺・ショップカード制作 / グラフィックデザイン / 印刷物デザイン',
+    industry: 'ビジネス全般',
+    scope: '名刺デザイン / レイアウト構成 / 入稿データ作成',
+    productionPoint:
+      '渡した瞬間に印象が伝わるよう、シンプルさと個性のバランスを大切にしました。印刷入稿まで対応できるデータ形式で仕上げています。',
+  },
 };
-
-const CATEGORIES: Record<WorkType, string[]> = {
-  チラシ: ['グラフィックデザイン', 'チラシ・フライヤー制作', '印刷物デザイン'],
-  メニュー表: ['グラフィックデザイン', 'メニュー表・POP制作', '印刷物デザイン'],
-  LP: ['Webデザイン', 'ランディングページ制作', 'コーディング'],
-  Webサイト: ['Webデザイン', 'Webサイト制作', 'コーディング'],
-  Amazon商品画像: ['グラフィックデザイン', 'Amazon商品画像制作', '画像加工・編集'],
-  YouTubeサムネイル: ['グラフィックデザイン', 'サムネイル制作', '動画関連デザイン'],
-  ロゴ: ['ロゴ・アイコン作成', 'ブランドデザイン', 'グラフィックデザイン'],
-  バナー: ['バナー制作', 'Webデザイン', 'グラフィックデザイン'],
-  カタログ: ['グラフィックデザイン', 'カタログ・パンフレット制作', '印刷物デザイン'],
-  名刺: ['名刺・ショップカード制作', 'グラフィックデザイン', '印刷物デザイン'],
-};
-
-const BASE_TAGS: Record<WorkType, string[]> = {
-  チラシ: ['チラシデザイン', 'フライヤー', 'DTPデザイン', 'Illustrator', 'グラフィックデザイン'],
-  メニュー表: ['メニュー表デザイン', 'DTPデザイン', 'Illustrator', 'グラフィックデザイン'],
-  LP: ['LPデザイン', 'ランディングページ', 'Webデザイン', 'HTML', 'CSS', 'レスポンシブデザイン'],
-  Webサイト: ['Webデザイン', 'ホームページ制作', 'HTML', 'CSS', 'レスポンシブデザイン'],
-  Amazon商品画像: ['Amazon商品画像', '商品画像制作', 'Photoshop', 'ECデザイン'],
-  YouTubeサムネイル: ['YouTubeサムネイル', 'サムネイルデザイン', 'Photoshop', 'バナーデザイン'],
-  ロゴ: ['ロゴデザイン', 'ブランディング', 'Illustrator', 'CI・VIデザイン'],
-  バナー: ['バナーデザイン', 'Webバナー', 'Photoshop', 'Illustrator', '広告デザイン'],
-  カタログ: ['カタログデザイン', 'パンフレット', 'DTPデザイン', 'Illustrator'],
-  名刺: ['名刺デザイン', 'ショップカード', 'DTPデザイン', 'Illustrator'],
-};
-
-function buildTitle(data: PortfolioFormData): string {
-  const { workType, industry, designFeature } = data;
-
-  if (industry && designFeature) {
-    return `${industry}向け${workType} ｜ ${designFeature}`;
-  }
-  if (industry) return `${industry}向け${workType}`;
-  if (designFeature) return `${workType} ｜ ${designFeature}`;
-  return `${workType}デザイン`;
-}
-
-function buildDescription(data: PortfolioFormData): string {
-  const { workType, productionType, industry, target, designFeature, purpose, memo } = data;
-
-  let opening: string;
-  switch (productionType) {
-    case '依頼を受けて制作':
-      opening = industry
-        ? `${industry}のクライアント様よりご依頼をいただき、${workType}を制作いたしました。`
-        : `クライアント様よりご依頼をいただき、${workType}を制作いたしました。`;
-      break;
-    case 'サンプル制作':
-      opening = industry
-        ? `${industry}を想定したサンプル作品として、${workType}を制作しました。`
-        : `ポートフォリオ用のサンプル作品として、${workType}を制作しました。`;
-      break;
-    case '架空案件':
-      opening = industry
-        ? `${industry}の架空クライアントを想定して、${workType}を制作しました。`
-        : `架空の案件を想定して、${workType}を制作しました。`;
-      break;
-  }
-
-  const contextParts: string[] = [];
-  if (target) contextParts.push(`${target}をメインターゲットに`);
-  if (purpose) contextParts.push(`${purpose}を目的として`);
-
-  let body: string;
-  if (contextParts.length > 0 && designFeature) {
-    body = `${contextParts.join('、')}、${designFeature}を意識したデザインに仕上げました。`;
-  } else if (contextParts.length > 0) {
-    body = `${contextParts.join('、')}、視認性とデザイン性のバランスを意識して仕上げました。`;
-  } else if (designFeature) {
-    body = `${designFeature}を意識し、全体のまとまりを大切にデザインしました。`;
-  } else {
-    body = '視認性と訴求力のバランスを意識して、丁寧にデザインしました。';
-  }
-
-  const main = opening + body;
-  return memo ? `${main}\n\n${memo}` : main;
-}
-
-function buildScope(data: PortfolioFormData): string {
-  return data.scope.trim() || DEFAULT_SCOPES[data.workType];
-}
-
-function buildTags(data: PortfolioFormData): string[] {
-  const tags = [...BASE_TAGS[data.workType]];
-  const feature = data.designFeature.toLowerCase();
-
-  if (feature.includes('シンプル') || feature.includes('ミニマル')) {
-    tags.push('シンプルデザイン');
-  }
-  if (feature.includes('かわいい') || feature.includes('ポップ')) {
-    tags.push('かわいいデザイン');
-  }
-  if (feature.includes('高級') || feature.includes('エレガント') || feature.includes('上品')) {
-    tags.push('高級感');
-  }
-  if (feature.includes('プロ') || feature.includes('ビジネス') || feature.includes('信頼')) {
-    tags.push('ビジネスデザイン');
-  }
-  if (feature.includes('和') || feature.includes('和風') || feature.includes('和モダン')) {
-    tags.push('和風デザイン');
-  }
-
-  if (data.industry) tags.push(data.industry);
-
-  return [...new Set(tags)];
-}
-
-function buildShareNote(
-  data: PortfolioFormData,
-  title: string,
-  categories: string[]
-): string {
-  const typeLabel =
-    data.productionType === '依頼を受けて制作' ? '受注制作' : data.productionType;
-  return [
-    `【ポートフォリオ掲載用】${title}`,
-    `制作区分：${typeLabel}`,
-    `カテゴリ：${categories[0]}`,
-  ].join('\n');
-}
 
 export function generateContent(data: PortfolioFormData): GeneratedContent {
-  const title = buildTitle(data);
-  const categories = CATEGORIES[data.workType];
-  const description = buildDescription(data);
-  const scope = buildScope(data);
-  const tags = buildTags(data);
-  const shareNote = buildShareNote(data, title, categories);
+  const tpl = TEMPLATES[data.workType];
+  const title = tpl.title[data.productionType];
 
-  return { title, description, scope, categories, tags, shareNote };
+  const baseDescription = tpl.description[data.productionType];
+  const description = data.memo.trim()
+    ? `${baseDescription}\n\n${data.memo.trim()}`
+    : baseDescription;
+
+  const productionTypeLabel =
+    data.productionType === '依頼を受けて制作' ? '受注制作' : data.productionType;
+
+  const firstCategory = tpl.categories.split(' / ')[0];
+
+  const shareNote = [
+    `【ポートフォリオ掲載用】${title}`,
+    `制作区分：${productionTypeLabel}`,
+    `カテゴリ：${firstCategory}`,
+  ].join('\n');
+
+  return {
+    title,
+    subtitle: tpl.subtitle,
+    description,
+    keywords: tpl.keywords,
+    categories: tpl.categories,
+    industry: tpl.industry,
+    scope: tpl.scope,
+    productionPoint: tpl.productionPoint,
+    shareNote,
+  };
 }
