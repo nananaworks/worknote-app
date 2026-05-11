@@ -64,6 +64,11 @@ export default function HistoryPanel({ history, onSelect, onDelete, onClose }: P
                   <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-md font-medium flex-shrink-0">
                     {entry.formData.workType}
                   </span>
+                  {entry.formData.industryOption && (
+                    <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md flex-shrink-0">
+                      {entry.formData.industryOption}
+                    </span>
+                  )}
                   <span className="text-xs text-slate-400 flex-shrink-0">
                     {formatDate(entry.createdAt)}
                   </span>

@@ -15,6 +15,8 @@ export type ProductionType = '依頼を受けて制作' | 'サンプル制作' |
 export interface PortfolioFormData {
   workType: WorkType;
   productionType: ProductionType;
+  categoryOption: string;
+  industryOption: string;
   memo: string;
   imageName: string;
 }
@@ -24,11 +26,6 @@ export interface GeneratedContent {
   subtitle: string;
   description: string;
   keywords: string;
-  categories: string;
-  industry: string;
-  scope: string;
-  productionPoint: string;
-  shareNote: string;
 }
 
 export interface HistoryEntry {
