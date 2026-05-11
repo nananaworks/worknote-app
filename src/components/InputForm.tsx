@@ -310,16 +310,19 @@ export default function InputForm({ formData, onChange, onGenerate }: Props) {
 
         {/* Memo */}
         <div>
-          <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">
+          <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1">
             補足メモ{' '}
             <span className="text-slate-400 font-normal normal-case tracking-normal ml-1">
               任意
             </span>
           </label>
+          <p className="text-xs text-slate-400 mb-1.5 leading-relaxed">
+            画像内容は自動解析されません。キャンペーン名・商品名・訴求内容を入力すると生成精度が上がります。
+          </p>
           <textarea
             value={formData.memo}
             onChange={(e) => onChange({ ...formData, memo: e.target.value })}
-            placeholder="例：美容室のキャンペーンチラシ。春らしい明るい印象で制作。Photoshop / Illustratorで作成。"
+            placeholder="例：光回線の新規申込キャンペーン。月額料金・工事費無料・Wi-Fiルータープレゼントを大きく訴求。表面と裏面があるチラシ。"
             rows={3}
             className="w-full px-3 py-2 text-sm text-slate-700 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 placeholder:text-slate-300 resize-none"
           />

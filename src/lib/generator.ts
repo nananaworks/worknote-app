@@ -276,65 +276,125 @@ export const DEFAULT_CATEGORIES: Record<WorkType, { parent: string; child: strin
 };
 
 // ─────────────────────────────────────────────
-// INDUSTRY_META — flat lookup for description context & keywords
+// INDUSTRY_META — flat lookup: context phrase + max 2-3 keywords (no NG words)
+// NG: SaaS, DX, BtoB, Web, AI (unless explicitly in memo)
 // ─────────────────────────────────────────────
 
 const INDUSTRY_META: Record<string, { context: string; keywords: string[] }> = {
   '': { context: '', keywords: [] },
-  '飲食店・カフェ':           { context: '飲食店・カフェ向けに',           keywords: ['飲食店', 'カフェ', '集客', '来店促進'] },
-  '居酒屋・バー':             { context: '居酒屋・バー向けに',             keywords: ['居酒屋', 'バー', '集客', '夜営業', '来店促進'] },
-  '美容室・ヘアサロン':       { context: '美容室・ヘアサロン向けに',       keywords: ['美容室', 'ヘアサロン', '集客', '予約促進'] },
-  'エステ・スパ':             { context: 'エステ・スパ向けに',             keywords: ['エステ', 'スパ', '美容', 'リラクゼーション', '集客'] },
-  'ネイル・まつ毛サロン':     { context: 'ネイル・まつ毛サロン向けに',     keywords: ['ネイル', 'まつ毛', 'サロン', '美容', '予約'] },
-  '医療・クリニック':         { context: '医療・クリニック向けに',         keywords: ['クリニック', '医療', '集患', '患者獲得'] },
-  '歯科医院':                 { context: '歯科医院向けに',                 keywords: ['歯科', '歯科医院', '集患', 'デンタル', '予約'] },
-  '薬局・調剤薬局':           { context: '薬局・調剤薬局向けに',           keywords: ['薬局', '調剤', '医療', 'ドラッグストア'] },
-  '整体・鍼灸・マッサージ':   { context: '整体・鍼灸院向けに',             keywords: ['整体', '鍼灸', 'マッサージ', '施術', '集客'] },
-  'スポーツジム・フィットネス': { context: 'スポーツジム・フィットネス向けに', keywords: ['フィットネス', 'ジム', '健康', '入会促進'] },
-  'ヨガ・ピラティス教室':     { context: 'ヨガ・ピラティス教室向けに',     keywords: ['ヨガ', 'ピラティス', '体験', '入会', '健康'] },
-  '学習塾・予備校':           { context: '学習塾・予備校向けに',           keywords: ['学習塾', '予備校', '生徒募集', '入塾'] },
-  '習い事・カルチャースクール': { context: '習い事・スクール向けに',        keywords: ['習い事', 'スクール', '体験', '受講', '教室'] },
-  '語学・資格スクール':       { context: '語学・資格スクール向けに',       keywords: ['語学', '英会話', '資格', 'スクール', '受講'] },
-  'IT・Webサービス':          { context: 'IT・Webサービス向けに',          keywords: ['ITサービス', 'Web', 'SaaS', 'DX', 'BtoB'] },
-  'アプリ・SaaS開発':         { context: 'アプリ・SaaS向けに',             keywords: ['アプリ', 'SaaS', 'IT', 'クラウド', 'サービス'] },
-  'ゲーム・eスポーツ':        { context: 'ゲーム・eスポーツ向けに',        keywords: ['ゲーム', 'eスポーツ', 'エンタメ', 'ゲーミング'] },
-  '金融・保険':               { context: '金融・保険業向けに',             keywords: ['金融', '保険', 'FP', '資産', '安心'] },
-  '税理士・会計事務所':       { context: '税理士・会計事務所向けに',       keywords: ['税理士', '会計', '節税', '経営', '法人'] },
-  '弁護士・司法書士・行政書士': { context: '法律事務所向けに',             keywords: ['弁護士', '法律', '司法書士', '行政書士'] },
-  '不動産・賃貸':             { context: '不動産・賃貸業向けに',           keywords: ['不動産', '賃貸', '物件', '仲介', '集客'] },
-  '建設・リフォーム':         { context: '建設・リフォーム業向けに',       keywords: ['建設', 'リフォーム', '工務店', '施工', '集客'] },
-  'インテリア・家具':         { context: 'インテリア・家具業向けに',       keywords: ['インテリア', '家具', '内装', 'ショールーム'] },
-  '小売・量販店':             { context: '小売・量販店向けに',             keywords: ['小売', '量販店', '店舗', '集客', '販促'] },
-  'ファッション・アパレル':   { context: 'ファッション・アパレル向けに',   keywords: ['ファッション', 'アパレル', 'ブランド', 'コーディネート'] },
-  'コスメ・化粧品':           { context: 'コスメ・化粧品ブランド向けに',   keywords: ['コスメ', '化粧品', '美容', 'スキンケア', 'ブランド'] },
-  'EC・通販':                 { context: 'EC・通販向けに',                 keywords: ['EC', '通販', 'ネットショップ', '購入促進'] },
-  '食品・飲料メーカー':       { context: '食品・飲料メーカー向けに',       keywords: ['食品', '飲料', 'メーカー', '商品', 'パッケージ'] },
-  '農業・農産物':             { context: '農業・農産物向けに',             keywords: ['農業', '農産物', '産直', '新鮮', 'ブランド'] },
-  '製造業・メーカー':         { context: '製造業・メーカー向けに',         keywords: ['製造業', 'メーカー', 'BtoB', '工業', '技術'] },
-  '旅行・観光業':             { context: '旅行・観光業向けに',             keywords: ['旅行', '観光', 'ツアー', '集客', 'リゾート'] },
-  'ホテル・旅館':             { context: 'ホテル・旅館向けに',             keywords: ['ホテル', '旅館', '宿泊', '集客', 'おもてなし'] },
-  'ブライダル・結婚式場':     { context: 'ブライダル・結婚式場向けに',     keywords: ['ブライダル', '結婚式', 'ウェディング', '集客'] },
-  '音楽・アーティスト':       { context: '音楽・アーティスト向けに',       keywords: ['音楽', 'アーティスト', 'ライブ', 'ブランディング'] },
-  '映像・映画制作':           { context: '映像・映画制作向けに',           keywords: ['映像', '映画', '制作会社', 'クリエイター'] },
-  'アニメ・漫画・イラスト':   { context: 'アニメ・漫画・イラスト向けに',   keywords: ['アニメ', '漫画', 'イラスト', 'キャラクター'] },
-  'YouTube・動画クリエイター': { context: 'YouTubeチャンネル向けに',        keywords: ['YouTube', 'クリエイター', '動画', 'チャンネル', 'サムネイル'] },
-  'SNS・インフルエンサー':    { context: 'SNS・インフルエンサー向けに',    keywords: ['SNS', 'インフルエンサー', 'Instagram', 'ブランディング'] },
-  '出版・書籍':               { context: '出版・書籍向けに',               keywords: ['出版', '書籍', '本', '電子書籍'] },
-  'NPO・NGO・社会福祉':       { context: 'NPO・NGO・社会福祉向けに',       keywords: ['NPO', 'NGO', '社会貢献', '福祉', '認知拡大'] },
-  '介護・福祉施設':           { context: '介護・福祉施設向けに',           keywords: ['介護', '福祉', '老人ホーム', '施設', '入居促進'] },
-  '保育園・幼稚園':           { context: '保育園・幼稚園向けに',           keywords: ['保育園', '幼稚園', '子育て', '入園促進', '保護者'] },
-  'ペット・動物病院':         { context: 'ペット・動物病院向けに',         keywords: ['ペット', '動物病院', '獣医', 'トリミング', '集客'] },
-  '自動車・バイク':           { context: '自動車・バイク業界向けに',       keywords: ['自動車', 'バイク', '車', 'ディーラー', '販促'] },
-  'アウトドア・スポーツ用品': { context: 'アウトドア・スポーツ用品向けに', keywords: ['アウトドア', 'スポーツ', 'キャンプ', 'ブランド'] },
-  '占い・スピリチュアル':     { context: '占い・スピリチュアル向けに',     keywords: ['占い', 'スピリチュアル', 'タロット', '集客', '鑑定'] },
-  '家事代行・清掃':           { context: '家事代行・清掃業向けに',         keywords: ['家事代行', '清掃', 'ハウスクリーニング', '集客'] },
-  '光回線・通信':             { context: '光回線・通信サービス向けに',     keywords: ['光回線', '通信', 'インターネット', 'キャンペーン'] },
-  '環境・エネルギー':         { context: '環境・エネルギー向けに',         keywords: ['環境', 'エネルギー', '再生可能', 'SDGs', 'エコ'] },
-  '人材・採用・HR':           { context: '人材・採用サービス向けに',       keywords: ['人材', '採用', 'HR', '求人', '転職'] },
+  '飲食店・カフェ':           { context: '飲食店・カフェ向けに',           keywords: ['飲食店', 'カフェ', '集客'] },
+  '居酒屋・バー':             { context: '居酒屋・バー向けに',             keywords: ['居酒屋', 'バー', '集客'] },
+  '美容室・ヘアサロン':       { context: '美容室・ヘアサロン向けに',       keywords: ['美容室', 'ヘアサロン', '集客'] },
+  'エステ・スパ':             { context: 'エステ・スパ向けに',             keywords: ['エステ', 'スパ', 'リラクゼーション'] },
+  'ネイル・まつ毛サロン':     { context: 'ネイル・まつ毛サロン向けに',     keywords: ['ネイル', 'まつ毛サロン', '集客'] },
+  '医療・クリニック':         { context: '医療・クリニック向けに',         keywords: ['クリニック', '集患'] },
+  '歯科医院':                 { context: '歯科医院向けに',                 keywords: ['歯科', '集患'] },
+  '薬局・調剤薬局':           { context: '薬局・調剤薬局向けに',           keywords: ['薬局', '調剤薬局'] },
+  '整体・鍼灸・マッサージ':   { context: '整体・鍼灸院向けに',             keywords: ['整体', '鍼灸', '施術'] },
+  'スポーツジム・フィットネス': { context: 'スポーツジム・フィットネス向けに', keywords: ['フィットネス', 'ジム'] },
+  'ヨガ・ピラティス教室':     { context: 'ヨガ・ピラティス教室向けに',     keywords: ['ヨガ', 'ピラティス'] },
+  '学習塾・予備校':           { context: '学習塾・予備校向けに',           keywords: ['学習塾', '生徒募集'] },
+  '習い事・カルチャースクール': { context: '習い事・スクール向けに',        keywords: ['習い事', 'スクール'] },
+  '語学・資格スクール':       { context: '語学・資格スクール向けに',       keywords: ['語学', '英会話', '資格'] },
+  'IT・Webサービス':          { context: 'IT・Webサービス向けに',          keywords: ['ITサービス', 'デジタル'] },
+  'アプリ・SaaS開発':         { context: 'アプリ・サービス向けに',         keywords: ['アプリ', 'クラウド'] },
+  'ゲーム・eスポーツ':        { context: 'ゲーム・eスポーツ向けに',        keywords: ['ゲーム', 'eスポーツ'] },
+  '金融・保険':               { context: '金融・保険業向けに',             keywords: ['金融', '保険'] },
+  '税理士・会計事務所':       { context: '税理士・会計事務所向けに',       keywords: ['税理士', '会計'] },
+  '弁護士・司法書士・行政書士': { context: '法律事務所向けに',             keywords: ['弁護士', '法律'] },
+  '不動産・賃貸':             { context: '不動産・賃貸業向けに',           keywords: ['不動産', '賃貸'] },
+  '建設・リフォーム':         { context: '建設・リフォーム業向けに',       keywords: ['建設', 'リフォーム'] },
+  'インテリア・家具':         { context: 'インテリア・家具業向けに',       keywords: ['インテリア', '家具'] },
+  '小売・量販店':             { context: '小売・量販店向けに',             keywords: ['小売', '店舗販促'] },
+  'ファッション・アパレル':   { context: 'ファッション・アパレル向けに',   keywords: ['ファッション', 'アパレル'] },
+  'コスメ・化粧品':           { context: 'コスメ・化粧品ブランド向けに',   keywords: ['コスメ', 'スキンケア'] },
+  'EC・通販':                 { context: 'EC・通販向けに',                 keywords: ['通販', 'ネットショップ'] },
+  '食品・飲料メーカー':       { context: '食品・飲料メーカー向けに',       keywords: ['食品', '飲料'] },
+  '農業・農産物':             { context: '農業・農産物向けに',             keywords: ['農産物', '産直'] },
+  '製造業・メーカー':         { context: '製造業・メーカー向けに',         keywords: ['製造業', 'メーカー'] },
+  '旅行・観光業':             { context: '旅行・観光業向けに',             keywords: ['旅行', '観光'] },
+  'ホテル・旅館':             { context: 'ホテル・旅館向けに',             keywords: ['ホテル', '旅館'] },
+  'ブライダル・結婚式場':     { context: 'ブライダル・結婚式場向けに',     keywords: ['ブライダル', 'ウェディング'] },
+  '音楽・アーティスト':       { context: '音楽・アーティスト向けに',       keywords: ['音楽', 'アーティスト'] },
+  '映像・映画制作':           { context: '映像・映画制作向けに',           keywords: ['映像', '映画'] },
+  'アニメ・漫画・イラスト':   { context: 'アニメ・漫画・イラスト向けに',   keywords: ['アニメ', 'イラスト'] },
+  'YouTube・動画クリエイター': { context: 'YouTubeチャンネル向けに',        keywords: ['YouTube', '動画'] },
+  'SNS・インフルエンサー':    { context: 'SNS・インフルエンサー向けに',    keywords: ['SNS', 'インフルエンサー'] },
+  '出版・書籍':               { context: '出版・書籍向けに',               keywords: ['出版', '書籍'] },
+  'NPO・NGO・社会福祉':       { context: 'NPO・NGO向けに',                 keywords: ['NPO', '社会貢献'] },
+  '介護・福祉施設':           { context: '介護・福祉施設向けに',           keywords: ['介護', '福祉'] },
+  '保育園・幼稚園':           { context: '保育園・幼稚園向けに',           keywords: ['保育園', '幼稚園'] },
+  'ペット・動物病院':         { context: 'ペット・動物病院向けに',         keywords: ['ペット', '動物病院'] },
+  '自動車・バイク':           { context: '自動車・バイク業界向けに',       keywords: ['自動車', 'バイク'] },
+  'アウトドア・スポーツ用品': { context: 'アウトドア・スポーツ用品向けに', keywords: ['アウトドア', 'スポーツ'] },
+  '占い・スピリチュアル':     { context: '占い・スピリチュアル向けに',     keywords: ['占い', 'スピリチュアル'] },
+  '家事代行・清掃':           { context: '家事代行・清掃業向けに',         keywords: ['家事代行', 'ハウスクリーニング'] },
+  '光回線・通信':             { context: '光回線・通信サービス向けに',     keywords: ['通信サービス', 'インターネット'] },
+  '環境・エネルギー':         { context: '環境・エネルギー向けに',         keywords: ['環境', 'エネルギー'] },
+  '人材・採用・HR':           { context: '人材・採用向けに',               keywords: ['人材', '採用'] },
 };
 
 // ─────────────────────────────────────────────
-// Title — generic formula: {industry}向け{workTypeLabel}をデザインしました
+// Memo keyword extraction
+// ─────────────────────────────────────────────
+
+// Ordered by keyword priority: campaign/specific terms first, layout/tools last
+const MEMO_PATTERNS: string[] = [
+  'キャンペーン', '新規申込', '期間限定', 'セール', '新商品', '限定', '無料体験',
+  'プレゼント', '特典', '割引', 'ポイント', '半額',
+  '光回線', 'Wi-Fi', 'WiFi', 'インターネット', '通信サービス', 'ブロードバンド',
+  '月額料金', '工事費無料',
+  'ランチ', 'ディナー', '食べ放題', '飲み放題', 'テイクアウト', 'デリバリー',
+  'ヘアカラー', 'カット', 'トリートメント', 'パーマ',
+  '予約', '問い合わせ', '来店', '来院', '入会', '体験', 'トライアル', '資料請求',
+  '採用', '求人', '転職',
+  '新生活', '年末年始',
+  '表面', '裏面', '両面',
+  'A4', 'A3', 'B4', 'B5',
+  'Illustrator', 'Photoshop', 'InDesign', 'Figma',
+  'BtoB', 'BtoC', 'SaaS', 'DX', 'AI',
+  'Instagram', 'Twitter', 'LINE', 'YouTube', 'TikTok', 'SNS',
+  'クリニック', '歯科', '整体', '鍼灸',
+  'スクール', '塾', '資格', '英会話',
+  'ホテル', '旅館', '温泉',
+  'Amazon', '楽天市場',
+  'バレンタイン', 'クリスマス', 'ハロウィン',
+  '春', '夏', '秋', '冬',
+];
+
+function extractMemoKeywords(memo: string): string[] {
+  if (!memo.trim()) return [];
+  return MEMO_PATTERNS.filter((p) => memo.includes(p));
+}
+
+// Layout/tool tokens not useful as search keywords
+const MEMO_EXCLUDE_FROM_KW = new Set([
+  '表面', '裏面', '両面', 'A4', 'A3', 'B4', 'B5',
+  'Illustrator', 'Photoshop', 'InDesign', 'Figma',
+]);
+
+// Tokens not useful as Para 2 feature mentions
+const MEMO_EXCLUDE_FROM_PARA2 = new Set([
+  '表面', '裏面', '両面', 'A4', 'A3', 'B4', 'B5',
+  'Illustrator', 'Photoshop', 'InDesign', 'Figma',
+  'BtoB', 'BtoC', 'SaaS', 'DX', 'AI',
+  'Instagram', 'Twitter', 'LINE', 'YouTube', 'TikTok', 'SNS',
+  '春', '夏', '秋', '冬',
+]);
+
+function extractMemoFirstPhrase(memo: string, workShortLabel: string): string | null {
+  const trimmed = memo.trim();
+  if (!trimmed) return null;
+  const first = trimmed.split(/[。．\n]/)[0].trim();
+  if (!first) return null;
+  // If work type name already in phrase, skip (avoids "チラシ向けチラシ")
+  if (first.includes(workShortLabel)) return null;
+  const cleaned = first.replace(/[をにはがのでと、。\s]+$/, '').trim();
+  return cleaned.length >= 4 && cleaned.length <= 30 ? cleaned : null;
+}
+
+// ─────────────────────────────────────────────
+// Title — memo phrase > industry > bare label
 // ─────────────────────────────────────────────
 
 const WORK_TITLE_LABEL: Record<WorkType, string> = {
@@ -350,42 +410,89 @@ const WORK_TITLE_LABEL: Record<WorkType, string> = {
   '名刺':              '名刺',
 };
 
-function buildTitle(workType: WorkType, industryOption: string): string {
+// Short noun used inside description sentences
+const WORK_SHORT: Record<WorkType, string> = {
+  'チラシ':            'チラシ',
+  'メニュー表':        'メニュー表',
+  'LP':                'ランディングページ',
+  'Webサイト':         'Webサイト',
+  'Amazon商品画像':    '商品画像',
+  'YouTubeサムネイル': 'サムネイル',
+  'ロゴ':              'ロゴ',
+  'バナー':            'Webバナー',
+  'カタログ':          'カタログ',
+  '名刺':              '名刺',
+};
+
+function buildTitle(workType: WorkType, industryOption: string, memo: string): string {
   const label = WORK_TITLE_LABEL[workType];
+  const short = WORK_SHORT[workType];
+  const memoPhrase = extractMemoFirstPhrase(memo, short);
+  if (memoPhrase) return `${memoPhrase}向け${label}をデザインしました`;
   return industryOption
     ? `${industryOption}向け${label}をデザインしました`
     : `${label}をデザインしました`;
 }
 
 // ─────────────────────────────────────────────
-// Subtitle — workType specific
+// Subtitle — varies by production type
 // ─────────────────────────────────────────────
 
-const SUBTITLES: Record<WorkType, string> = {
-  'チラシ':
-    '料金・特典・サービスの魅力が一目で伝わるよう、訴求力の高い販促チラシとして制作しました',
-  'メニュー表':
-    'メニューの見やすさと店舗の雰囲気が伝わるよう、来店客が選びやすいデザインとして制作しました',
-  'LP':
-    '問い合わせ・申し込みにつながる導線を意識し、サービスの魅力が伝わるLPとして制作しました',
-  'Webサイト':
-    '事業内容と信頼感が伝わるよう、使いやすく整理されたWebサイトとして制作しました',
-  'Amazon商品画像':
-    '商品の特徴とベネフィットが一目で伝わるよう、購入を後押しする商品画像として制作しました',
-  'YouTubeサムネイル':
-    '動画内容が直感的に伝わり、クリックしたくなるサムネイルとして制作しました',
-  'ロゴ':
-    'ブランドの世界観と信頼感が伝わる、長く使えるロゴとして制作しました',
-  'バナー':
-    '短時間で訴求ポイントが伝わり、クリックを促すバナーとして制作しました',
-  'カタログ':
-    '商品・サービスの魅力を読み進めやすく整理した、使いやすいカタログとして制作しました',
-  '名刺':
-    '手渡した瞬間に印象が伝わるよう、信頼感のある名刺デザインとして制作しました',
+const SUBTITLES: Record<WorkType, Record<ProductionType, string>> = {
+  'チラシ': {
+    '依頼を受けて制作': '料金・特典・サービスの魅力が一目で伝わるよう、訴求力の高い販促チラシとして制作しました',
+    'サンプル制作':     'ターゲットへの訴求力と視認性を意識した、販促チラシのサンプル制作です',
+    '架空案件':         '架空のクライアントを想定し、集客・販促を目的としたチラシデザインを制作しました',
+  },
+  'メニュー表': {
+    '依頼を受けて制作': 'メニューの見やすさと店舗の雰囲気が伝わるよう、来店客が選びやすいデザインとして制作しました',
+    'サンプル制作':     '視認性とメニューの魅力が伝わることを意識した、メニュー表のサンプル制作です',
+    '架空案件':         '架空の店舗を想定し、見やすく選びやすいメニュー表デザインを制作しました',
+  },
+  'LP': {
+    '依頼を受けて制作': '問い合わせ・申し込みにつながる導線を意識し、サービスの魅力が伝わるLPとして制作しました',
+    'サンプル制作':     'コンバージョンにつながる導線設計と訴求構成を意識した、LPデザインのサンプル制作です',
+    '架空案件':         '架空のサービスを想定し、問い合わせ・申込獲得を目的としたLPデザインを制作しました',
+  },
+  'Webサイト': {
+    '依頼を受けて制作': '事業内容と信頼感が伝わるよう、使いやすく整理されたWebサイトとして制作しました',
+    'サンプル制作':     '情報設計と使いやすさを意識した、Webサイトデザインのサンプル制作です',
+    '架空案件':         '架空の企業・サービスを想定し、コーポレートサイトのデザインを制作しました',
+  },
+  'Amazon商品画像': {
+    '依頼を受けて制作': '商品の特徴とベネフィットが一目で伝わるよう、購入を後押しする商品画像として制作しました',
+    'サンプル制作':     'クリック率と購買意欲を意識した、Amazon商品画像のサンプル制作です',
+    '架空案件':         '架空の商品を想定し、Amazon出品向けの商品画像デザインを制作しました',
+  },
+  'YouTubeサムネイル': {
+    '依頼を受けて制作': '動画内容が直感的に伝わり、クリックしたくなるサムネイルとして制作しました',
+    'サンプル制作':     'インパクトとクリック率を意識した、サムネイルデザインのサンプル制作です',
+    '架空案件':         '架空のYouTubeチャンネルを想定し、クリックを促すサムネイルデザインを制作しました',
+  },
+  'ロゴ': {
+    '依頼を受けて制作': 'ブランドの世界観と信頼感が伝わる、長く使えるロゴとして制作しました',
+    'サンプル制作':     'ブランドアイデンティティの視覚化を意識した、ロゴデザインのサンプル制作です',
+    '架空案件':         '架空のブランドを想定し、世界観と信頼感を表現したロゴデザインを制作しました',
+  },
+  'バナー': {
+    '依頼を受けて制作': '短時間で訴求ポイントが伝わり、クリックを促すWebバナーとして制作しました',
+    'サンプル制作':     '視線誘導とCTAを意識した、Webバナーデザインのサンプル制作です',
+    '架空案件':         '架空のキャンペーンを想定し、クリックを促すWebバナーデザインを制作しました',
+  },
+  'カタログ': {
+    '依頼を受けて制作': '商品・サービスの魅力を読み進めやすく整理した、使いやすいカタログとして制作しました',
+    'サンプル制作':     '情報整理と読みやすさを意識した、カタログデザインのサンプル制作です',
+    '架空案件':         '架空の商品・サービスを想定し、魅力が伝わるカタログデザインを制作しました',
+  },
+  '名刺': {
+    '依頼を受けて制作': '手渡した瞬間に印象が伝わるよう、信頼感のある名刺デザインとして制作しました',
+    'サンプル制作':     '第一印象と信頼感を意識した、名刺デザインのサンプル制作です',
+    '架空案件':         '架空のビジネスパーソンを想定し、印象に残る名刺デザインを制作しました',
+  },
 };
 
 // ─────────────────────────────────────────────
-// Description — 3 paragraphs
+// Description — 3 paragraphs, memo-aware
 // ─────────────────────────────────────────────
 
 const OPENERS: Record<ProductionType, string> = {
@@ -449,8 +556,8 @@ const WORK_TYPE_END: Record<WorkType, Record<ProductionType, string>> = {
 
 const DESC_BODY: Record<WorkType, { p2: string; p3: string }> = {
   'チラシ': {
-    p2: '特典・料金・サービス内容などの主要な訴求ポイントを目立つ位置に配置し、手に取った瞬間にメリットが伝わるレイアウトを意識しています。表面では視覚的にインパクトのある見出しとビジュアルで注目を集め、裏面ではサービスの詳細・申し込み方法・問い合わせ先など、必要な情報をわかりやすく整理して掲載する構成を設計しました。',
-    p3: '情報量が多い場合でも読み疲れないよう、アイコンや図解・カラーブロックを活用して情報をグループ化しています。配色のコントラストと余白のバランスを整えることで、視線が自然に重要な情報へ誘導される構成にしました。',
+    p2: '特典・料金・サービス内容などの主要な訴求ポイントを目立つ位置に配置し、手に取った瞬間にメリットが伝わるレイアウトを意識しています。情報の優先順位を整理し、視線が自然に重要な訴求へ誘導されるよう、余白・フォントサイズ・配色のバランスを丁寧に調整しました。',
+    p3: 'アイコンや図解・カラーブロックを活用して情報をグループ化し、読み疲れしないレイアウトを設計しています。配色のコントラストと余白のバランスを整えることで、視線が自然に重要な情報へ誘導される構成にしました。',
   },
   'メニュー表': {
     p2: '来店客が目当ての商品を素早く見つけられるよう、メニューをカテゴリーごとに整理し、商品名・価格・説明文の情報階層を明確にしています。写真やアイコンを効果的に配置し、料理やドリンクの魅力が視覚的に伝わるデザインを意識しました。',
@@ -490,6 +597,30 @@ const DESC_BODY: Record<WorkType, { p2: string; p3: string }> = {
   },
 };
 
+// Para 2 templates when memo has 2+ feature keywords
+const PARA2_MEMO: Record<WorkType, (kws: string) => string> = {
+  'チラシ': (kws) =>
+    `${kws}などの訴求内容が一目で伝わるよう、情報の優先順位とレイアウトを丁寧に設計しています。見出しのサイズ感・余白のバランス・カラーコントラストを調整し、読み手の視線が自然に重要な情報へ流れるよう仕上げました。`,
+  'メニュー表': (kws) =>
+    `${kws}などの情報が素早く見つけられるよう、カテゴリーごとに整理して情報階層を明確にしています。写真やアイコンを効果的に配置し、メニューの魅力が視覚的に伝わるデザインを意識しました。`,
+  'LP': (kws) =>
+    `${kws}などのポイントを効果的に訴求するため、ファーストビューから導線設計まで一貫した構成にしています。スクロールに沿ってサービスの特徴・選ばれる理由・CTAへ自然につながる流れを設計しました。`,
+  'Webサイト': (kws) =>
+    `${kws}などの情報が整理されるよう、サイト全体の情報設計を丁寧に組み立てています。訪問者が目的の情報にスムーズにたどり着けるナビゲーション設計を意識しました。`,
+  'Amazon商品画像': (kws) =>
+    `${kws}などの情報が短時間で伝わるよう、テキストは最小限に絞り視線誘導を意識してレイアウトしています。メイン画像のクリック率とサブ画像での購入判断の両方を重視して設計しました。`,
+  'YouTubeサムネイル': (kws) =>
+    `${kws}などのテーマが瞬時に伝わるよう、コントラストの高い配色と大きく読みやすいテキストでインパクトを出しています。サムネイル一覧の中でも埋もれないデザインを意識しました。`,
+  'ロゴ': (kws) =>
+    `${kws}などのブランド要素を視覚化し、シンプルかつ印象的なロゴシンボルを設計しています。シンボルマークとロゴタイプのバランスを調整し、縦横どちらの配置でも成立するよう制作しました。`,
+  'バナー': (kws) =>
+    `${kws}などの訴求ポイントが一目で伝わるよう、限られたスペースでキャッチコピー・ビジュアル・CTAの優先順位を整理しています。視線がコピーからCTAへ自然に流れるレイアウトを意識しました。`,
+  'カタログ': (kws) =>
+    `${kws}などの情報が読み進めやすいよう、ページ構成と優先順位を整理しています。各ページに適切な写真・テキスト・価格表示を配置し、読み手が内容の詳細へ自然にたどり着ける流れを設計しました。`,
+  '名刺': (kws) =>
+    `${kws}などの情報が見やすく整理されるよう、優先順位とレイアウトを丁寧に設計しています。手渡した相手がブランドや担当者のイメージを瞬時に掴めるよう、余白・フォント・配色のバランスを調整しました。`,
+};
+
 function buildDescription(
   workType: WorkType,
   productionType: ProductionType,
@@ -500,46 +631,82 @@ function buildDescription(
   const ctx = INDUSTRY_META[industryOption]?.context ?? '';
   const endPhrase = WORK_TYPE_END[workType][productionType];
   const body = DESC_BODY[workType];
+  const short = WORK_SHORT[workType];
 
-  const para1 = ctx
-    ? `${opener}、${ctx}${endPhrase}`
-    : `${opener}、${endPhrase}`;
+  const memoTrimmed = memo.trim();
+  const memoKws = extractMemoKeywords(memoTrimmed);
+  const memoPhrase = extractMemoFirstPhrase(memoTrimmed, short);
 
-  const base = `${para1}\n\n${body.p2}\n\n${body.p3}`;
-  return memo.trim() ? `${base}\n\n${memo.trim()}` : base;
+  // Para 1 — use memo first phrase when available
+  let para1: string;
+  if (memoPhrase) {
+    const templates: Record<ProductionType, string> = {
+      '依頼を受けて制作': `クライアントからの依頼を受け、${memoPhrase}の${short}を制作しました。`,
+      'サンプル制作':     `ポートフォリオ掲載用のサンプルとして、${memoPhrase}を想定した${short}デザインを制作しました。`,
+      '架空案件':         `架空案件として、${memoPhrase}を想定した${short}デザインを制作しました。`,
+    };
+    para1 = templates[productionType];
+  } else {
+    para1 = ctx ? `${opener}、${ctx}${endPhrase}` : `${opener}、${endPhrase}`;
+  }
+
+  // Para 2 — use memo feature keywords when 2+ are available
+  const featureKws = memoKws.filter((k) => !MEMO_EXCLUDE_FROM_PARA2.has(k));
+  let para2: string;
+  if (featureKws.length >= 2) {
+    para2 = PARA2_MEMO[workType](featureKws.slice(0, 4).join('・'));
+  } else {
+    para2 = body.p2;
+  }
+
+  // Para 3 — チラシ with explicit 表面/裏面 in memo gets layout-specific text
+  const hasLayout = memoKws.some((k) => k === '表面' || k === '裏面' || k === '両面');
+  let para3: string;
+  if (hasLayout && workType === 'チラシ') {
+    para3 = `表面では主要な訴求ポイントを視覚的にインパクト強く提示し、裏面ではサービスの詳細・申込方法・問い合わせ先など、行動につながる情報を整理して掲載する構成で設計しました。配色や余白を統一することで、表裏を通じた一貫したデザインに仕上げました。`;
+  } else {
+    para3 = body.p3;
+  }
+
+  return `${para1}\n\n${para2}\n\n${para3}`;
 }
 
 // ─────────────────────────────────────────────
-// Keywords — base per workType + industry specific (up to 15)
+// Keywords — priority: work type > memo > industry (max 12 total)
 // ─────────────────────────────────────────────
 
+// Core keywords; first 6 are highest priority
 const BASE_KEYWORDS: Record<WorkType, string[]> = {
-  'チラシ':            ['チラシ', 'フライヤー', '販促物', '集客', 'グラフィックデザイン', '紙媒体', '広告デザイン', 'DTP'],
-  'メニュー表':        ['メニュー表', 'メニューデザイン', '価格表', '印刷物', 'グラフィックデザイン', '店舗デザイン', 'DTP'],
+  'チラシ':            ['チラシ', 'フライヤー', '販促物', '集客', '紙媒体', '広告デザイン', 'グラフィックデザイン', 'DTP'],
+  'メニュー表':        ['メニュー表', 'メニューデザイン', '価格表', '店舗デザイン', '印刷物', 'グラフィックデザイン', 'DTP'],
   'LP':                ['LP', 'ランディングページ', 'Webデザイン', 'UIデザイン', 'CTA', 'コンバージョン', 'サービス紹介'],
   'Webサイト':         ['Webデザイン', 'ホームページ', 'コーポレートサイト', 'レスポンシブ', '情報設計', 'UIデザイン'],
-  'Amazon商品画像':    ['Amazon', '商品画像', 'ECデザイン', '購入促進', 'Photoshop', 'サムネイル'],
-  'YouTubeサムネイル': ['YouTubeサムネイル', 'サムネイルデザイン', 'クリック率', 'バナーデザイン', 'Photoshop'],
-  'ロゴ':              ['ロゴデザイン', 'ブランディング', 'シンボルマーク', 'Illustrator', 'CI', 'ロゴタイプ'],
-  'バナー':            ['バナーデザイン', 'Webバナー', '広告デザイン', 'Illustrator', 'Photoshop', 'キャンペーンバナー'],
-  'カタログ':          ['カタログデザイン', 'パンフレット', 'DTP', '印刷物', 'Illustrator', '紙媒体'],
-  '名刺':              ['名刺デザイン', 'ショップカード', 'DTP', 'ビジネス', 'Illustrator', '印刷物'],
+  'Amazon商品画像':    ['Amazon', '商品画像', 'EC', '購入促進', 'サムネイル', '商品説明画像'],
+  'YouTubeサムネイル': ['YouTubeサムネイル', 'サムネイル', 'クリック率', '動画デザイン', 'バナーデザイン'],
+  'ロゴ':              ['ロゴデザイン', 'ブランディング', 'シンボルマーク', 'ロゴタイプ', 'CI'],
+  'バナー':            ['バナーデザイン', 'Webバナー', '広告デザイン', 'キャンペーンバナー', 'クリック促進'],
+  'カタログ':          ['カタログデザイン', 'パンフレット', '印刷物', '紙媒体', 'DTP'],
+  '名刺':              ['名刺デザイン', 'ショップカード', 'ビジネス', '印刷物', 'DTP'],
 };
 
 function buildKeywords(
   workType: WorkType,
   industryOption: string,
-  categoryOption: string,
+  memo: string,
+  _categoryOption: string,
 ): string {
-  const base = [...BASE_KEYWORDS[workType]];
-  const industryKws = INDUSTRY_META[industryOption]?.keywords ?? [];
-  const combined = [...base, ...industryKws];
+  // Priority 1: core work-type keywords (6 items max)
+  const base = BASE_KEYWORDS[workType].slice(0, 6);
 
-  if (categoryOption && !combined.includes(categoryOption)) {
-    combined.splice(2, 0, categoryOption);
-  }
+  // Priority 2: specific terms from memo (4 items max, exclude layout/tools)
+  const memoKws = extractMemoKeywords(memo)
+    .filter((k) => !MEMO_EXCLUDE_FROM_KW.has(k))
+    .slice(0, 4);
 
-  return [...new Set(combined)].slice(0, 15).join(', ');
+  // Priority 3: industry keywords (2 items max — NG words already removed from INDUSTRY_META)
+  const industryKws = (INDUSTRY_META[industryOption]?.keywords ?? []).slice(0, 2);
+
+  return [...new Set([...base, ...memoKws, ...industryKws])].slice(0, 12).join(', ');
 }
 
 // ─────────────────────────────────────────────
@@ -547,15 +714,15 @@ function buildKeywords(
 // ─────────────────────────────────────────────
 
 export function generateContent(data: PortfolioFormData): GeneratedContent {
-  const title = buildTitle(data.workType, data.industryOption);
-  const subtitle = SUBTITLES[data.workType];
+  const title = buildTitle(data.workType, data.industryOption, data.memo);
+  const subtitle = SUBTITLES[data.workType][data.productionType];
   const description = buildDescription(
     data.workType,
     data.productionType,
     data.industryOption,
     data.memo,
   );
-  const keywords = buildKeywords(data.workType, data.industryOption, data.categoryOption);
+  const keywords = buildKeywords(data.workType, data.industryOption, data.memo, data.categoryOption);
 
   return { title, subtitle, description, keywords };
 }
