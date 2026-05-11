@@ -2,7 +2,7 @@
 
 import { useRef, useState, useCallback } from 'react';
 import type { PortfolioFormData, WorkType, ProductionType } from '@/types';
-import { CATEGORY_OPTIONS, INDUSTRY_OPTIONS, DEFAULT_CATEGORIES } from '@/lib/generator';
+import { CATEGORY_TREE, INDUSTRY_OPTIONS, DEFAULT_CATEGORIES } from '@/lib/generator';
 
 const WORK_TYPES: WorkType[] = [
   'チラシ',
@@ -41,11 +41,21 @@ export default function InputForm({ formData, onChange, onGenerate }: Props) {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const setWorkType = (value: WorkType) =>
-    onChange({ ...formData, workType: value, categoryOption: DEFAULT_CATEGORIES[value] });
+  const currentChildren =
+    CATEGORY_TREE.find((t) => t.parent === formData.parentCategory)?.children ?? [];
+
+  const setWorkType = (value: WorkType) => {
+    const def = DEFAULT_CATEGORIES[value];
+    onChange({ ...formData, workType: value, parentCategory: def.parent, categoryOption: def.child });
+  };
 
   const setProductionType = (value: ProductionType) =>
     onChange({ ...formData, productionType: value });
+
+  const handleParentChange = (parent: string) => {
+    const firstChild = CATEGORY_TREE.find((t) => t.parent === parent)?.children[0] ?? '';
+    onChange({ ...formData, parentCategory: parent, categoryOption: firstChild });
+  };
 
   const handleFile = useCallback(
     (file: File) => {
@@ -89,7 +99,7 @@ export default function InputForm({ formData, onChange, onGenerate }: Props) {
       <div className="px-6 py-4 border-b border-slate-100 bg-slate-50">
         <h2 className="text-sm font-semibold text-slate-800">制作情報</h2>
         <p className="text-xs text-slate-500 mt-0.5">
-          タイプ・業種を選択して画像をアップロードしてください
+          タイプ・カテゴリー・業種を選択して画像をアップロードしてください
         </p>
       </div>
 
@@ -141,20 +151,21 @@ export default function InputForm({ formData, onChange, onGenerate }: Props) {
           </div>
         </fieldset>
 
-        {/* Category + Industry selects */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {/* Category (parent → child) + Industry */}
+        <div className="space-y-3">
+          {/* Parent category */}
           <div>
             <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">
-              カテゴリー候補
+              カテゴリー（大）
             </label>
             <div className="relative">
               <select
-                value={formData.categoryOption}
-                onChange={(e) => onChange({ ...formData, categoryOption: e.target.value })}
+                value={formData.parentCategory}
+                onChange={(e) => handleParentChange(e.target.value)}
                 className={SELECT_CLASS}
               >
-                {CATEGORY_OPTIONS.map((opt) => (
-                  <option key={opt} value={opt}>{opt}</option>
+                {CATEGORY_TREE.map(({ parent }) => (
+                  <option key={parent} value={parent}>{parent}</option>
                 ))}
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
@@ -165,9 +176,34 @@ export default function InputForm({ formData, onChange, onGenerate }: Props) {
             </div>
           </div>
 
+          {/* Child category */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">
+              カテゴリー（小）
+            </label>
+            <div className="relative">
+              <select
+                value={formData.categoryOption}
+                onChange={(e) => onChange({ ...formData, categoryOption: e.target.value })}
+                className={SELECT_CLASS}
+              >
+                {currentChildren.map((child) => (
+                  <option key={child} value={child}>{child}</option>
+                ))}
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          {/* Industry */}
           <div>
             <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">
               業種
+              <span className="text-slate-400 font-normal normal-case tracking-normal ml-1">任意</span>
             </label>
             <div className="relative">
               <select
@@ -176,7 +212,9 @@ export default function InputForm({ formData, onChange, onGenerate }: Props) {
                 className={SELECT_CLASS}
               >
                 {INDUSTRY_OPTIONS.map((opt) => (
-                  <option key={opt} value={opt}>{opt}</option>
+                  <option key={opt} value={opt}>
+                    {opt === '' ? '選択してください' : opt}
+                  </option>
                 ))}
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">

@@ -13,8 +13,9 @@ const MAX_HISTORY = 20;
 const INITIAL_FORM: PortfolioFormData = {
   workType: 'チラシ',
   productionType: '依頼を受けて制作',
+  parentCategory: 'デザイン・制作',
   categoryOption: 'チラシ作成・フライヤーデザイン',
-  industryOption: '店舗・サービス業',
+  industryOption: '',
   memo: '',
   imageName: '',
 };

@@ -15,6 +15,7 @@ export type ProductionType = '依頼を受けて制作' | 'サンプル制作' |
 export interface PortfolioFormData {
   workType: WorkType;
   productionType: ProductionType;
+  parentCategory: string;
   categoryOption: string;
   industryOption: string;
   memo: string;
